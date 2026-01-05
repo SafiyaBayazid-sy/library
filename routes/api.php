@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\BookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,21 @@ Route::post('categories' , [CategoryController::class,  'store']);
 Route::put('categories/{identifier}' , [CategoryController::class,  'update']);
 Route::delete('categories/{id}' , [CategoryController::class,  'destroy']);
 
+
 Route::apiResource('authors',AuthorController::class);
+// Route::apiResource('books' , BookController::class)->except('show');
+// Route::apiResource('books' , BookController::class)->only('index' ,'show');
+Route::apiResource('books' , BookController::class);
+
+
+/** **************** test routes ***************/
+Route::get('env' , function(){
+    return env('APP_NAME' , 'not found');
+});
+
+Route::get('config' , function(){
+    return config('app.name' , 'not found');
+});
+Route::get('public-path' , function(){
+    return storage_path('app/public');
+});
