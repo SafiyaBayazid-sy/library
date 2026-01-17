@@ -20,7 +20,7 @@ class BookSeeder extends Seeder
             "mortgage" => 10,
             "category_id" => 5
         ];
-        Book::create($book);
+        // Book::create($book);
 
 
         Book::factory(100)->create();

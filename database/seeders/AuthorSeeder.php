@@ -19,6 +19,8 @@ class AuthorSeeder extends Seeder
             ['name' => 'sara ali'],
 
         ];
-        Author::insert($authors);
+        // Author::insert($authors);
+
+        Author::factory()->count(10)->create();
     }
 }

@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Author extends Model
 {
     /** @use HasFactory<\Database\Factories\AuthorFactory> */
-    // use HasFactory;
+    use HasFactory;
       public $timestamps = false;
+        protected $fillable = ['name'];
+
+        function books(){
+            return $this->hasMany(Book::class);
+        }
 }

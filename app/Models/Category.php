@@ -9,4 +9,10 @@ class Category extends Model
     use HasFactory;
     public $timestamps = false;
     protected $fillable = ['name' , 'image'];
+
+    function books(){
+        return $this->hasMany(Book::class);
+    }
+
+
 }

@@ -20,6 +20,8 @@ class CategorySeeder extends Seeder
             ['name' => 'تاريخ'],
             ['name' => 'جغرافيا'],
         ];
-        Category::insert($categories);
+        // Category::insert($categories);
+
+        Category::factory()->count(10)->create();
     }
 }

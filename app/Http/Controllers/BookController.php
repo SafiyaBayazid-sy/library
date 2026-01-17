@@ -44,7 +44,9 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        $book->load('authors', 'category');
+        // $book=Book::withCount('authors')->get();
+        return ResponseHelper::success("تفاصيل الكتاب", $book);
     }
 
 
