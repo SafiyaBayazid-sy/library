@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
@@ -15,9 +16,9 @@ class BookController extends Controller
      */
     public function index()
     {
-        $book = Book::all();
-        return ResponseHelper::success(' جميع الكتب', $book);
-    }
+        $book=Book::with('authors', 'category')->get();
+        return ResponseHelper::success('جميع الكتب', $book);
+        }
 
 
 
@@ -26,16 +27,21 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        //  return $request->all();
         $book = Book::create($request->all());
+
+        $book->authors()->attach($request->author_ids);
+
 
         if ($request->hasFile('cover')){
             $file = $request->file('cover');
             $filename = "$request->ISBN." . $file->extension();
             Storage::putFileAs('book-images', $file ,$filename );
             $book->cover = $filename;
+
             $book->save();
         }
+
+        $book->load('authors','category');
         return ResponseHelper::success("تمت إضافة الكتاب", $book);
     }
 
@@ -45,7 +51,6 @@ class BookController extends Controller
     public function show(Book $book)
     {
         $book->load('authors', 'category');
-        // $book=Book::withCount('authors')->get();
         return ResponseHelper::success("تفاصيل الكتاب", $book);
     }
 
@@ -56,7 +61,30 @@ class BookController extends Controller
     public function update(UpdateBookRequest $request, Book $book)
     {
         $book->update($request->all());
-        return ResponseHelper::success("تمت تعديل الكتاب", $book);
+
+         if ($request->has('author_ids')) {
+        $book->authors()->sync($request->author_ids);
+    }
+
+        if ($request->hasFile('cover')) {
+        // Delete old cover
+        if ($book->cover) {
+            Storage::delete('book-images/' . $book->cover);
+        }
+
+        // Save new cover
+         $file = $request->file('cover');
+        $filename = "$request->ISBN." . $file->extension();
+
+        Storage::putFileAs('book-images', $file, $filename);
+        $book->cover = $filename;
+        $book->save();
+    }
+
+
+    $book->load('authors', 'category');
+
+        return ResponseHelper::success("تم تعديل الكتاب", $book);
 
     }
 
@@ -65,7 +93,11 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        $book->delete();
-        return ResponseHelper::success("تمت حذف الكتاب", $book);
+            if($book->cover)
+            Storage::delete('book-images/' . $book->cover);
+            $book->delete();
+
+            return ResponseHelper::success("تم حذف الكتاب", $book);
+
     }
 }

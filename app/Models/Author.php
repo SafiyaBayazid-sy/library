@@ -12,7 +12,7 @@ class Author extends Model
       public $timestamps = false;
         protected $fillable = ['name'];
 
-        function books(){
-            return $this->hasMany(Book::class);
-        }
+    function books(){
+        return $this->belongsToMany(Book::class );
+    }
 }

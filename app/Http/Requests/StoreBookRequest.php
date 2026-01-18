@@ -65,6 +65,19 @@ class StoreBookRequest extends FormRequest
                 'max:2024', // 2MB max size (in KB)
 
             ],
+
+        'author_ids' => [
+            'required',
+            'array',
+            'min:1',
+            'max:5',
+        ],
+        'author_ids.*' => [
+            'required',
+            'integer',
+            'exists:authors,id',
+            'distinct', // No duplicate IDs
+        ],
         ];
     }
 }

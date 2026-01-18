@@ -68,6 +68,17 @@ class UpdateBookRequest extends FormRequest
                 'mimes:jpeg,png,jpg,gif,webp,svg',
                 'max:2024',
             ],
+        'author_ids' => [
+                'sometimes',
+                'array',
+                'min:1',
+                'max:5',
+            ],
+            'author_ids.*' => [
+                'integer',
+                'exists:authors,id',
+                'distinct',
+            ],
 
         ];
     }

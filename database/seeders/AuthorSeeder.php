@@ -13,14 +13,6 @@ class AuthorSeeder extends Seeder
      */
     public function run(): void
     {
-        $authors = [
-            ['name' => 'mohamed nabil'],
-            ['name' => 'ahmed samir'],
-            ['name' => 'sara ali'],
-
-        ];
-        // Author::insert($authors);
-
-        Author::factory()->count(10)->create();
+        Author::factory(10)->create();
     }
 }
