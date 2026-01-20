@@ -13,9 +13,10 @@ Route::get('/', function () {
 Route::get('1-m-child/{category}', function (Category $category) {
     return $category->books;
 });
-Route::get('1-m-parent', function () {
-    $book = Book::where('ISBN', '1112223334445')->first();
-    return $book->category;
+Route::get('1-m-parent/{book}', function (Book $book) {
+    return $book->load('category');
+    // $book = Book::where('ISBN', '1112223334445')->first();
+    // return $book->category;
 });
 /** with */
 Route::get('test', function () {

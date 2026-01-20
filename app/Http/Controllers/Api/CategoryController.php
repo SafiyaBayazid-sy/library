@@ -8,13 +8,14 @@ use App\ResponseHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // $categories =  Category::all();
         // $categories =  Category::withAvg('books' , 'price')->get();
@@ -24,8 +25,12 @@ class CategoryController extends Controller
 
      public function show(Category $category)
     {
-        $category->load('books');
-       return ResponseHelper::success('بيانات الصنف',$category);
+    //     $category->load('books');
+    //    return ResponseHelper::success('بيانات الصنف',$category);
+        $categories =  Category::withCount('books')->get();
+
+    //    return ResponseHelper::success(trans('library.all-categories'),$categories);
+       return ResponseHelper::success(__('library.all-categories'),$categories);
     }
 
     /**

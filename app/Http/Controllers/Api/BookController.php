@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use App\Http\Resources\BookResource;
 use App\ResponseHelper;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -14,11 +16,43 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $book=Book::with('authors', 'category')->get();
-        return ResponseHelper::success('جميع الكتب', $book);
-        }
+        // $book=Book::with('authors', 'category')->get();
+        // return ResponseHelper::success('جميع الكتب', $book);
+        // }
+
+        // $book = Book::all();
+
+        /** using map to return custom fields */
+        // $books = Book::select("ISBN" ,"title" ,  "price" ,"mortgage" ,"cover")
+        // ->get()
+        // ->map(function($book){
+        //     return [
+        //         "ISBN" => $book->ISBN ,
+        //         "title" => $book->title ,
+        //         "price" => $book->price ,
+        //         "mortgage" => $book->mortgage ,
+        //         "cover" =>  asset('storage/book-images/' . ($book->cover ?? 'no-image.jpeg')) ,
+        //     ];
+        // });
+        // return ResponseHelper::success(' جميع الكتب', $books);
+
+        // if ($title){}, we use when() method instead of if condition
+
+        // $title = $request->has('title');
+        $title = $request->title;
+        $books = Book::select("id" ,"ISBN" ,"title" ,  "price" ,"mortgage" ,"cover" , "category_id")
+        ->when($title , function($q ) use ($title) {
+            return $q->where('title' , 'like' , "%$title%");
+        })
+        ->with(['authors', 'category'])
+        ->orderBy('id' )
+        ->get();
+
+        /** Using resource */
+        return ResponseHelper::success(trans('library.all-categories'), BookResource::collection($books));
+    }
 
 
 
@@ -34,7 +68,7 @@ class BookController extends Controller
 
         if ($request->hasFile('cover')){
             $file = $request->file('cover');
-            $filename = "$request->ISBN." . $file->extension();
+            $filename = "$book->ISBN." . $file->extension();
             Storage::putFileAs('book-images', $file ,$filename );
             $book->cover = $filename;
 
@@ -50,8 +84,11 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $book->load('authors', 'category');
-        return ResponseHelper::success("تفاصيل الكتاب", $book);
+        // $book->load('authors', 'category');
+        // return ResponseHelper::success("تفاصيل الكتاب", $book);
+        $book = $book->load(['authors:name', 'category']);
+
+        return ResponseHelper::success("تم إعادة الكتاب بنجاح", new BookResource($book));
     }
 
 
@@ -74,7 +111,7 @@ class BookController extends Controller
 
         // Save new cover
          $file = $request->file('cover');
-        $filename = "$request->ISBN." . $file->extension();
+        $filename = "$book->ISBN." . $file->extension();
 
         Storage::putFileAs('book-images', $file, $filename);
         $book->cover = $filename;
